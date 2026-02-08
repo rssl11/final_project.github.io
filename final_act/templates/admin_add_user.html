@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Add New User{% endblock %}
+
+{% block content %}
+<style>
+    .auth-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+    }
+
+    .auth-card {
+        background: white;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border: none;
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        text-align: center;
+        color: white;
+    }
+
+    .auth-header h3 {
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: 0.5px;
+    }
+
+    .auth-header p {
+        margin: 5px 0 0;
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+
+    .auth-body {
+        padding: 40px;
+    }
+
+    /* --- Input Field & Error Container --- */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-control {
+        background-color: #f8f9fa;
+        border: 1px solid #eee;
+        padding: 12px;
+        border-radius: 8px;
+        width: 100%;
+        margin-bottom: 0; /* Ensures control is tight to error message */
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .text-danger-small {
+        font-size: 0.85rem;
+        color: #dc3545;
+        margin-top: 5px;
+        display: block;
+    }
+    /* ------------------------------------- */
+
+    .password-wrapper {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    
+    .password-wrapper input {
+        margin-bottom: 0; 
+        padding-right: 40px; 
+    }
+
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        z-index: 10;
+        font-size: 1rem;
+    }
+
+    .toggle-password:hover {
+        color: #764ba2;
+    }
+    
+    .btn-auth {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: transform 0.2s;
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .btn-back {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .btn-back:hover { color: #333; }
+</style>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h3><i class="fas fa-user-plus me-2"></i>Create User</h3>
+            <p>Add a new user to the system manually</p>
+        </div>
+        
+        <div class="auth-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} text-center mb-4">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" onsubmit="return validateForm()">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <input type="text" id="firstname" name="firstname" class="form-control" placeholder="First Name" required>
+                        <span id="error-firstname" class="text-danger-small"></span>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <input type="text" id="lastname" name="lastname" class="form-control" placeholder="Last Name" required>
+                        <span id="error-lastname" class="text-danger-small"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" name="username" id="username" class="form-control" placeholder="Username" required>
+                    <span id="error-username" class="text-danger-small"></span>
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Email Address (user@domain.com)" required>
+                    <span id="error-email" class="text-danger-small"></span>
+                </div>
+                
+                <div class="password-wrapper form-group">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password (Minimum 8 chars)" required minlength="8">
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password', this)"></i>
+                    <span id="error-password" class="text-danger-small"></span>
+                </div>
+
+                <div class="password-wrapper form-group">
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm Password" required minlength="8">
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm_password', this)">"></i>
+                    <span id="error-confirm_password" class="text-danger-small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-auth">Create Account</button>
+                
+                <a href="{{ url_for('views_bp.admin_dashboard') }}" class="btn-back">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function clearErrors() {
+        document.querySelectorAll('.text-danger-small').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
+    }
+
+    function setError(inputId, message) {
+        // Find the correct error span ID
+        const errorSpanId = inputId.startsWith('confirm') ? `error-confirm_password` : `error-${inputId}`;
+        
+        const errorSpan = document.getElementById(errorSpanId);
+        const inputElement = document.getElementById(inputId);
+        
+        if (errorSpan && inputElement) {
+            errorSpan.textContent = message;
+            inputElement.classList.add('is-invalid');
+        } 
+    }
+
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            input.type = "password";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    }
+    
+    function isValidEmailFormat(email) {
+        // Regex to check for: user@domain.tld structure and requires at least two characters after the last dot.
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; 
+        return regex.test(email);
+    }
+
+    function validateForm() {
+        clearErrors();
+        let isValid = true;
+        
+        const firstName = document.getElementById("firstname").value.trim();
+        const lastName = document.getElementById("lastname").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const confirm = document.getElementById("confirm_password").value;
+
+        // 1. Name Capitalization Validation
+        if (firstName.length === 0 || firstName.charAt(0) !== firstName.charAt(0).toUpperCase()) {
+            setError("firstname", "Must start with a capital letter.");
+            isValid = false;
+        }
+        if (lastName.length === 0 || lastName.charAt(0) !== lastName.charAt(0).toUpperCase()) {
+            setError("lastname", "Must start with a capital letter.");
+            isValid = false;
+        }
+
+        // 2. Email Format Validation (Client-side check for structure)
+        if (!isValidEmailFormat(email)) {
+            setError("email", "Invalid email format (e.g., missing @ or '.com').");
+            isValid = false;
+        }
+
+        // 3. Password Length Validation (Minimum 8)
+        if (password.length < 8) {
+            setError("password", "Password must be at least 8 characters.");
+            isValid = false;
+        }
+
+        // 4. Password Match Validation
+        if (password !== confirm) {
+            setError("confirm_password", "Passwords do not match.");
+            // Also mark password field as invalid for consistency
+            document.getElementById("password").classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // If client-side validation fails, scroll to the top of the form and stop submission
+        if (!isValid) {
+            document.querySelector('.auth-card').scrollIntoView({ behavior: 'smooth' });
+            return false; 
+        }
+
+        // If client-side passes, allow submission. Server will run the final checks (domain existence, duplicates).
+        return true;
+    }
+</script>
+{% endblock %}

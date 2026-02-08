@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Arcade Arena{% endblock %}
+
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    .game-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .game-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    
+    .game-image-container {
+        height: 200px;
+        width: 100%;
+        overflow: hidden;
+        background-color: #eee;
+    }
+    
+    .game-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .game-card:hover .game-image {
+        transform: scale(1.05);
+    }
+    
+    .btn-play {
+        border-radius: 20px;
+        padding: 8px 25px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} text-center mb-4">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-5 text-primary">Game Library</h1>
+        <p class="text-muted lead">Choose your challenge and start playing!</p>
+    </div>
+
+    <div class="row justify-content-center g-4 mb-5">
+        
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/shape_catcher.jpg') }}" alt="Shape Catcher" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h3 class="card-title fw-bold mb-3">Shape Catcher</h3>
+                    <p class="card-text text-muted mb-4">
+                        Test your reflexes! Catch the falling shapes before they hit the ground.
+                    </p>
+                    <a href="{{ url_for('views_bp.play_game', game_name='Shape Catcher') }}" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-play me-2"></i> Launch Game
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/space_war_2p.jpg') }}" alt="Space War 2P" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h3 class="card-title fw-bold mb-3">Space War 2P</h3>
+                    <p class="card-text text-muted mb-4">
+                        Grab a friend! Dual pilot mode. P1 uses WASD, P2 uses Arrows.
+                    </p>
+                    <a href="{{ url_for('views_bp.play_game', game_name='Space War 2P') }}" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-user-friends me-2"></i> Launch Game
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/spacewar.jpg') }}" alt="Space War" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h3 class="card-title fw-bold mb-3">Space War</h3>
+                    <p class="card-text text-muted mb-4">
+                        Defend the galaxy! Pilot your ship and destroy incoming fleets.
+                    </p>
+                    <a href="{{ url_for('views_bp.play_game', game_name='Space War') }}" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-gamepad me-2"></i> Launch Game
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="my-5" style="opacity: 0.1;">
+
+    <div class="text-center mb-5">
+        <h2 class="fw-bold display-6 text-secondary">Class Activities</h2>
+        <p class="text-muted">Access your Google Colab assignments here.</p>
+    </div>
+
+    <div class="row justify-content-center g-4">
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/slip.jpg') }}" alt="Activity 1" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4 class="card-title fw-bold mb-3">Activity 1</h4>
+                    <p class="card-text text-muted mb-4">Google Colab Activity 1</p>
+                    <a href="https://colab.research.google.com/drive/1AESoMc9IXGHFnNZAD-Z6SLyC3FcpCtEI?usp=sharing" target="_blank" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-code me-2"></i> View Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/limp.jpg') }}" alt="Activity 2" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4 class="card-title fw-bold mb-3">Activity 2</h4>
+                    <p class="card-text text-muted mb-4">Google Colab Activity 2</p>
+                    <a href="https://colab.research.google.com/drive/1jBhnx44JWVX1lEpbvhUNn-GVnK5LxeWd?usp=sharing" target="_blank" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-code me-2"></i> View Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/embtomed.jpg') }}" alt="Activity 3" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4 class="card-title fw-bold mb-3">Activity 3</h4>
+                    <p class="card-text text-muted mb-4">Google Colab Activity 3</p>
+                    <a href="https://colab.research.google.com/drive/1AUxk65xWcjnqbyjTqMtp2oKycFb9VLHj?usp=sharing" target="_blank" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-code me-2"></i> View Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/red.jpg') }}" alt="Activity 4" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4 class="card-title fw-bold mb-3">Activity 4</h4>
+                    <p class="card-text text-muted mb-4">Google Colab Activity 4</p>
+                    <a href="https://colab.research.google.com/drive/10HEmzaP_khVDgqRtqQqICjERsTOScl1t?usp=sharing" target="_blank" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-code me-2"></i> View Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/soad.jpg') }}" alt="Activity 5" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4 class="card-title fw-bold mb-3">Activity 5</h4>
+                    <p class="card-text text-muted mb-4">Google Colab Activity 5</p>
+                    <a href="https://colab.research.google.com/drive/1gBxDpHnG9-gdbkugBrpgX2QvxgK6KzF0" target="_blank" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-code me-2"></i> View Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/korn.jpg') }}" alt="Activity 6" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4 class="card-title fw-bold mb-3">Activity 6</h4>
+                    <p class="card-text text-muted mb-4">Google Colab Activity 6</p>
+                    <a href="https://colab.research.google.com/drive/1nbTXciPBoi4ySc933zym3J34UCkTUFV7" target="_blank" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-code me-2"></i> View Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card game-card h-100 shadow-sm">
+                <div class="game-image-container">
+                    <img src="{{ url_for('static', filename='img/pveil.jpg') }}" alt="Activity 7" class="game-image">
+                </div>
+                <div class="card-body text-center p-4">
+                    <h4 class="card-title fw-bold mb-3">Activity 7</h4>
+                    <p class="card-text text-muted mb-4">Google Colab Activity 7</p>
+                    <a href="https://colab.research.google.com/drive/1wBZdPjnRwYYfA0pl9SlOROVv0vjlwk0V" target="_blank" class="btn btn-primary btn-play w-100">
+                        <i class="fas fa-code me-2"></i> View Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

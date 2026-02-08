@@ -1,0 +1,685 @@
+{% extends "base.html" %}
+{# Initialize errors to prevent undefined variable crashes #}
+{% set errors = errors | default({}) %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    /* Custom Styling */
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .register-container {
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+
+    .card-register {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        text-align: center;
+        color: white;
+    }
+
+    .card-header-custom h2 {
+        font-weight: 700;
+        margin-bottom: 5px;
+        font-size: 2rem;
+    }
+
+    .card-header-custom p {
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #764ba2;
+        box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.15);
+    }
+
+    .input-group-text {
+        background-color: #fff;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        cursor: pointer;
+        color: #6c757d;
+    }
+    
+    .password-field {
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+    }
+
+    .section-title {
+        color: #6c757d;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        margin-top: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .btn-register {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 8px;
+        width: 100%;
+        margin-top: 20px;
+        transition: transform 0.2s;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+    }
+
+    .field-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .login-link a {
+        color: #764ba2;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .flash {
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="container register-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <div class="card card-register">
+                <div class="card-header-custom">
+                    <h2>Create Account</h2>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for msg in messages %}
+                            <div class="alert alert-warning flash" role="alert">
+                                {{ msg }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('auth_bp.register') }}" novalidate enctype="multipart/form-data">
+                        
+                        <div class="text-center mb-4">
+                            <div style="position: relative; display: inline-block;">
+                                
+                                <div class="rounded-circle border border-3 border-primary shadow-sm d-flex justify-content-center align-items-center" 
+                                     style="width: 130px; height: 130px; background-color: #e9ecef; overflow: hidden; cursor: pointer;"
+                                     onclick="document.getElementById('profilePicInput').click();">
+                                    
+                                    <i class="fas fa-user fa-4x text-secondary" id="defaultIcon"></i>
+
+                                    <img src="" 
+                                         id="profilePreview" 
+                                         style="width: 100%; height: 100%; object-fit: cover; display: none;" 
+                                         alt="Profile Preview">
+                                </div>
+                                
+                                <div class="bg-warning text-dark rounded-circle d-flex justify-content-center align-items-center shadow-sm" 
+                                     style="width: 35px; height: 35px; position: absolute; bottom: 5px; right: 5px; border: 2px solid white; cursor: pointer;"
+                                     onclick="document.getElementById('profilePicInput').click();">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                            </div>
+                            
+                            <input type="file" name="profile_pic" id="profilePicInput" accept="image/*" style="display: none;">
+                            <p class="text-muted small mt-2">Upload Profile Picture (Optional)</p>
+                        </div>
+
+                        <div class="section-title mt-0">Account Information</div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Username</label>
+                                <input type="text" name="username" class="form-control" placeholder="Choose a username"
+                                    value="{{ form.username if form else '' }}"
+                                    title="Username must start with a letter and can include letters, numbers, dots, and underscores"
+                                    required>
+                                {% if errors.username %}
+                                    <div class="field-error">{{ errors.username }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email" class="form-control" placeholder="example@email.com"
+                                    value="{{ form.email if form else '' }}"
+                                    required>
+                                {% if errors.email %}
+                                    <div class="field-error">{{ errors.email }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="section-title">Personal Details</div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">First Name</label>
+                                <input type="text" name="firstname" class="form-control" placeholder="First Name"
+                                    value="{{ form.firstname if form else '' }}"
+                                    title="Start with a capital letter, at least 2 characters, letters and spaces only" required>
+                                {% if errors.firstname %}
+                                    <div class="field-error">{{ errors.firstname }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Middle Name</label>
+                                <input type="text" name="middlename" class="form-control" placeholder="Middle Name (Optional)"
+                                    value="{{ form.middlename if form else '' }}"
+                                    title="Start with a capital letter, at least 2 characters, letters and spaces only">
+                                {% if errors.middlename %}
+                                    <div class="field-error">{{ errors.middlename }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="lastname" class="form-control" placeholder="Last Name"
+                                    value="{{ form.lastname if form else '' }}"
+                                    title="Start with a capital letter, at least 2 characters, letters and spaces only" required>
+                                {% if errors.lastname %}
+                                    <div class="field-error">{{ errors.lastname }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Birthday</label>
+                                <input type="date" id="birthday" name="birthday" class="form-control"
+                                    value="{{ form.birthday if form else '' }}" required>
+                                {% if errors.birthday %}
+                                    <div class="field-error">{{ errors.birthday }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Age</label>
+                                <input type="text" id="age" name="age" class="form-control"
+                                    value="{{ form.age if form else '' }}"
+                                    placeholder="Auto-calculated" readonly>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Contact Number</label>
+                                <input type="text" id="contact" name="contact" class="form-control" placeholder="09XXXXXXXXX"
+                                    value="{{ form.contact if form else '' }}"
+                                    maxlength="11" required>
+                                {% if errors.contact %}
+                                    <div class="field-error">{{ errors.contact }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="section-title">Address</div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Province</label>
+                                <select id="province" name="province" class="form-select" required>
+                                    <option value="">Select Province</option>
+                                    <option value="Laguna" {% if form and form.province == 'Laguna' %}selected{% endif %}>Laguna</option>
+                                </select>
+                                {% if errors.province %}
+                                    <div class="field-error">{{ errors.province }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City/Municipality</label>
+                                <select id="city" name="city" class="form-select" required>
+                                    <option value="">Select City/Municipality</option>
+                                    {% if form and form.city %}
+                                        <option value="{{ form.city }}" selected>{{ form.city }}</option>
+                                    {% endif %}
+                                </select>
+                                {% if errors.city %}
+                                    <div class="field-error">{{ errors.city }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Barangay</label>
+                                <select id="barangay" name="barangay" class="form-select">
+                                    <option value="">Select Barangay</option>
+                                    {% if form and form.barangay %}
+                                        <option value="{{ form.barangay }}" selected>{{ form.barangay }}</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Zip Code</label>
+                                <input type="text" id="zip_code" name="zip_code" class="form-control" placeholder="Zip Code" readonly
+                                    value="{{ form.zip_code if form else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="section-title">Security</div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input type="password" id="password" name="password" class="form-control password-field" 
+                                        placeholder="Min 8 chars" required
+                                        value="{{ form.password if form and form.password else '' }}">
+                                    <span class="input-group-text" onclick="togglePassword('password', this)">
+                                        <i class="fas fa-eye-slash"></i>
+                                    </span>
+                                </div>
+                                {% if errors.password %}
+                                    <div class="field-error">{{ errors.password }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <input type="password" id="confirm_password" name="confirm_password" class="form-control password-field" 
+                                        placeholder="Retype password" required
+                                        value="{{ form.confirm_password if form and form.confirm_password else '' }}">
+                                    <span class="input-group-text" onclick="togglePassword('confirm_password', this)">
+                                        <i class="fas fa-eye-slash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-register">
+                            Create Account <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+
+                    </form>
+
+                    <div class="login-link">
+                        Already have an account? <a href="{{ url_for('auth_bp.login') }}">Login here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. PASSWORD TOGGLE LOGIC (FIXED) ---
+    function togglePassword(id, el) {
+        const input = document.getElementById(id);
+        const icon = el.querySelector('i');
+        
+        if (input.type === "password") {
+            // Show Password
+            input.type = "text";
+            icon.classList.remove('fa-eye-slash'); // Remove closed eye
+            icon.classList.add('fa-eye');          // Add open eye
+        } else {
+            // Hide Password
+            input.type = "password";
+            icon.classList.remove('fa-eye');       // Remove open eye
+            icon.classList.add('fa-eye-slash');    // Add closed eye
+        }
+    }
+
+    // --- 2. ADDRESS DATA & LOGIC (FULL) ---
+    const zipCodeInput = document.getElementById("zip_code");
+
+    // Address Data Structure
+    const addressData = {
+        "Laguna": {
+            "Alaminos":{
+                "zip_code": "4001",
+                "barangays":["Barangay I (Poblacion)", "Barangay II (Poblacion)", "Barangay III (Poblacion)", 
+                "Barangay IV (Poblacion)", "Del Carmen", "Palma", "San Agustin (Antipolo)", "San Andres", "San Benito (Palita)", 
+                "San Gregorio", "San Ildefonso", "San Juan", "San Miguel", "San Roque", "Santa Rosa"]
+            },
+            "Bay": {
+                "zip_code": "4033",
+                "barangays": ["Bitin", "Calo", "Dila", "Maitim", "Masaya", "Paciano Rizal", 
+                "Puypuy", "San Agustin", "San Antonio", "San Isidro", 
+                "San Nicolas", "Santa Cruz", "Santo Domingo", "Tagumpay", "Tranca"]
+            },    
+            "Biñan": {
+                "zip_code": "4024",
+                "barangays": ["Canlalay", "San Antonio", "San Francisco", "San Jose", "San Vicente", 
+                "Santo Domingo", "Sto. Niño", "Zapote", "Ganado", "Dela Paz", 
+                "Langkiwa", "Malaban", "Malamig", "Mampalasan", "Platero", 
+                "San Gabriel", "Santo Tomas", "Timbao", "Tubigan"]
+            },
+            "Calamba": {
+                "zip_code": "4027",
+                "barangays": ["Banlic", "Bagong Kalsada", "Batino", "Bubuyan", "Bunggo", 
+                "Burol", "Camaligan", "Canlubang", "Halang", "Hornalan", 
+                "Kay-Anlog", "Laguerta", "La Mesa", "Lawa", "Lecheria", 
+                "Lingga", "Looc", "Mabato", "Majada Out", "Makiling", 
+                "Mapagong", "Masili", "Maunong", "Milagrosa", "Paciano Rizal", 
+                "Palingon", "Palo-Alto", "Pansol", "Parian", "Prinza", 
+                "Punta", "Puting Lupa", "Real", "Saimsim", "Sampiruhan", 
+                "San Benito", "San Cristobal", "San Jose", "San Juan", 
+                "Sirang Lupa", "Sucol", "Turbina", "Ulango", "Uwisan"]
+            },
+            "Calauan": {
+                "zip_code": "4012",
+                "barangays": ["Balayhangin", "Bangyas", "Dayap", "Hanggan", "Imok", 
+                "Kanluran (Pob.)", "Lamot 1", "Lamot 2", "Limao", "Mabacan", 
+                "Masiit", "Paliparan", "Perez", "Prinza", "San Isidro", 
+                "Santo Tomas", "Silangan"]
+            },
+            "Cabuyao": {
+                "zip_code": "4025",
+                "barangays": ["Baclaran", "Banay-Banay", "Banlic", "Bigaa", "Butong", "Casile", 
+                "Diezmo", "Gulod", "Mamatid", "Marinig", "Niugan", 
+                "Pittland", "Pulo", "Sala", "San Isidro", 
+                "Barangay Uno (Pob.)", "Barangay Dos (Pob.)", "Barangay Tres (Pob.)"]
+            },
+            "Cavinti": {
+                "zip_code": "4013",
+                "barangays": ["Anglas", "Bangco", "Bukal", "Cansuso", "Duhat", "Inao-Awan", 
+                "Kanluran Talaongan", "Labayo", "Layasin", "Mahipon", "Paowin", 
+                "Poblacion", "Silangan Talaongan", "Sumucab"]
+            },
+            "Famy": {
+                "zip_code": "4021",
+                "barangays": ["Asana", "Bagong Pag-Asa", "Balitoc", "Banaba", "Caballero", 
+                "Calumpang", "Kapatalan", "Kataypuanan", "Tunhac", "Poblacion", "Tunhac II"]
+            },
+            "Kalayaan": {
+                "zip_code": "4010",
+                "barangays": ["Longos", "San Antonio", "San Juan", "San Pablo Norte", "San Pablo Sur"]
+            },    
+            "Liliw": {
+                "zip_code": "4004",
+                "barangays": ["Bagong Anyo", "Bayate", "Bongkol", "Cabezang San Juan", "Cabaong", 
+                "Calumpang", "Duhat", "Ibabang Palina", "Ibabang San Roque", 
+                "Ibabang Taykin", "Ilayang Palina", "Ilayang San Roque", 
+                "Ilayang Taykin", "Kanlurang Bukal", "Laguan", "Luquin", 
+                "Malabo-Kaabay", "Masikap", "Novaliches", "Oples", "Pag-asa", 
+                "Palina", "San Isidro", "Silangan Bukal", "Tuy-Baño"]
+            },
+            "Los Baños": {
+                "zip_code": "4030",
+                "barangays": ["Anos", "Bagong Silang", "Bambang", "Batong Malake", "Baybayin", 
+                "Bayog", "Lalakay", "Maahas", "Malinta", "Mayondon", 
+                "Putho-Tuntungin", "San Antonio", "Tadlac", "Timugan"]
+            },
+            "Luisiana": {
+                "zip_code": "4032",
+                "barangays": ["De La Paz", "Don Juan", "Lewin", "Malulut", "San Antonio", 
+                "San Buenaventura", "San Diego", "San Isidro", "San Jose", 
+                "San Luis", "San Pablo", "San Pedro", "Santo Domingo", 
+                "Santo Tomas", "Zone I (Poblacion)", "Zone II (Poblacion)", 
+                "Zone III (Poblacion)", "Zone IV (Poblacion)"]
+            },
+            "Lumban": {
+                "zip_code": "4014",
+                "barangays": ["Balimbingan", "Bagong Silang", "Caliraya", "Concepcion", "Lewin", 
+                "Maracta", "Maytalang I", "Maytalang II", "Primera Parang", 
+                "Remedios I", "Remedios II", "Salac", "Sebitanan", "Silangan", "Wawa"]
+            },
+            "Mabitac": {
+                "zip_code": "4015",
+                "barangays": ["Amuyong", "Lambac", "Libis ng Nayon", "Lucong", "Maligaya", 
+                "Masikap", "Pag-Asa", "Paowin", "Poblacion", "Sagrada Familia", 
+                "San Antonio", "San Miguel", "Santa Catalina"]
+            },
+            "Magdalena": {
+                "zip_code": "4028",
+                "barangays": ["Alipit", "Bambang", "Buenavista", "Buo", "Bubukal", 
+                "Buenlag", "Ilog", "Malaking Ambling", "Malinao", 
+                "Poblacion 1", "Poblacion 2", "Sabang", "Salinas", "Tanawan", "Tipunan"]
+            },
+            "Majayjay": {
+                "zip_code": "4005",
+                "barangays": ["Bakia", "Balanac", "Botocan", "Buñgan", "Coralao", "Gagalot", 
+                "Ilayang Bayucain", "Ibabang Bayucain", "Malinao", "May-It", 
+                "Olla", "Panglan", "Poblacion Barangay 1", "Poblacion Barangay 2", 
+                "Poblacion Barangay 3", "Poblacion Barangay 4", "San Francisco", 
+                "San Isidro", "San Miguel", "Suba"]
+            },
+            "Nagcarlan": {
+                "zip_code": "4002",
+                "barangays": ["Alibungbungan", "Alumbrado", "Babayuan", "Balayong", "Bambang", 
+                "Banilad", "Bunga", "Cabuyew", "Calumpang", "Kanluran (Poblacion 1)", 
+                "Ibabang Amonoy", "Ibabang Bukal", "Ibabang Kabatete", 
+                "Ibabang Kuiit", "Ilayang Amonoy", "Ilayang Bukal", "Ilayang Kabatete", 
+                "Ilayang Kuiit", "Manaol", "Maravilla", "Palayan", "Sabang", 
+                "San Francisco", "Santa Lucia", "Silangan (Poblacion 2)", "Sinipian", "Sibulan"]
+            },
+            "Paete": {
+                "zip_code": "4016",
+                "barangays": ["Bagumbayan", "Bangkusay", "Ermita", "Ibaba del Norte", 
+                "Ibaba del Sur", "Ilaya del Norte", "Ilaya del Sur", 
+                "Maytoong", "Quinale", "Rizal"]
+            },
+            "Pagsanjan": {
+                "zip_code": "4008",
+                "barangays": ["Biñan", "Cabanbanan", "Calusiche", "Dingin", "Lambac", 
+                "Layugan", "Maulawin", "Pinagsanjan", "Poblacion I", 
+                "Poblacion II", "Sabang", "Sampaloc"]
+            },
+            "Pakil": {
+                "zip_code": "4017",
+                "barangays": ["Baño", "Burgos", "Casinsin", "Dorado", "Gaza", 
+                "Rizal", "San Isidro", "Taft", "Tavera", "Taft I", "Taft II"]
+            },
+            "Pangil": {
+                "zip_code": "4018",
+                "barangays": ["Balian", "Dambo", "Dorado", "Galalan", "Isla", "Mabato-Azufre", 
+                "Natividad", "San Isidro", "Sulib"]
+            },
+            "Pila": {
+                "zip_code": "4010",
+                "barangays": ["Aplaya", "Bagong Pook", "Bukal", "Bulilan Norte (Poblacion)", 
+                "Bulilan Sur (Poblacion)", "Concepcion", "Labuin", "Linga", 
+                "Masico", "Mojon", "Pansol", "Pinagbayanan", "San Antonio", 
+                "San Miguel", "Santa Clara Norte", "Santa Clara Sur", "Tubuan"]
+            },
+            "Rizal": {
+                "zip_code": "4031",
+                "barangays": ["Antipolo", "Entablado", "Pauli 1", "Pauli 2", "East Poblacion", 
+                "West Poblacion", "Talortor", "Tuy", "Limocon"]
+            },
+            "San Pablo": {
+                "zip_code": "4000",
+                "barangays": ["Atisan", "Bautista", "Concepcion (Bunot)", "Del Remedio (Wawa)", "Dolores", "I-A (Sambat)", 
+                "I-B (City Sub Riverside)", "I-C (Bagong Bayan)", "II-A (Triangulo/Guadalupe 2)", "II-B (Guadalupe 1)", 
+                "II-C (Unson)", "II-D (Bulante)", "II-E (San Anton)", "II-F (Villa Rey)", "III-A (Hermanos Belen)", "III-B", 
+                "III-C (Labak/De Roma)", "III-D (Villongco)", "III-E", "III-F (Balagtas)", "IV-A", "IV-B", "IV-C", "V-A", "V-B", 
+                "V-C", "V-D", "VI-A (Mavenida)", "VI-B (Sabang Mabini)", "VI-C (Bagong Pook)", "VI-D (Lakeside)", "VI-E (YMCA)", 
+                "VII-A (P.Alcantara)", "VII-B", "VII-C", "VII-D", "VII-E", "San Antonio 1 (Balanga)", "San Antonio 2 (Sapa)", 
+                "San Bartolome (Matang-ag)", "San Buenaventura (Palakpakin)", "San Crispin (Lumbangan)", "San Cristobal", 
+                "San Diego (Tiim)", "San Francisco (Calihan)", "San Gabriel (Butucan)", "San Gregorio", "San Ignacio", 
+                "San Isidro (Balagbag)", "San Joaquin", "San Jose (Malamig)", "San Juan (Putol)", "San Lorenzo (Saluyan)", 
+                "San Lucas 1 (Malinaw)", "San Lucas 2 (Malinaw)", "San Marcos (Tikew)", "San Mateo (Imok)", "San Miguel (Balatuin)", 
+                "San Nicolas (Mag-ampon)", "San Pedro", "San Rafael (Buluburan)", "San Roque (Sambat)", "San Vicente", "Santa Ana", 
+                "Santa Catalina (Sandig)", "Santa Cruz (Putol)", "Santa Elena", "Santa Filomena (Banlagin)", "Santa Isabel", 
+                "Santa Maria", "Santa Maria Magdalena (Boe/Kuba)", "Santa Monica", "Santa Veronica (Bae)", "Santiago I (Bulaho)", 
+                "Santiago II (Bulaho)", "Santisimo Rosario (Balagbag)", "Santo Angel (Ilog)", "Santo Cristo", "Santo Niño (Arsum)", 
+                "Silangan Kabubuhayan", "Soledad (Macopa)"]
+            },
+            "San Pedro": {
+                "zip_code": "4023",
+                "barangays": ["Bagong Silang", "Calendola", "Chrysanthemum", "Cuyab", "Estrella", "Fatima", 
+                "G.S.I.S.", "Landayan", "Langgam", "Laram", "Maharlika", "Narra", 
+                "Nueva", "Pacita 1", "Pacita 2", "Poblacion", "Riverside", 
+                "Rosario", "Sampaguita Village", "San Antonio", "San Lorenzo", 
+                "San Roque", "San Vicente", "Sto. Niño", "United Bayanihan"]
+            },
+            "Santa Cruz": {
+                "zip_code": "4009",
+                "barangays": ["Alipit", "Bagumbayan", "Bubukal", "Calios", "Duhat", "Gatid", "Jasaan", "Labuin", "Malinao", "Oogong", 
+                "Pagsawitan", "Palasan", "Patimbao", "Poblacion I", "Poblacion II", 
+                "Poblacion III", "Poblacion IV", "Poblacion V", "San Jose", "San Juan", "San Pablo Norte",
+                "San Pablo Sur", "Santisima Cruz","Santo Angel Central","Santo Angel Norte", "Santo Angel Sur"]
+            },
+            "Santa Maria": {
+                "zip_code": "4022",
+                "barangays": ["Adia", "Bagong Pook", "Bagumbayan", "Bubucal", "Cabooan", "Calangay", "Cambuja", "Coralan", "Cueva", 
+                "Inayapan", "Jose P. Laurel, Sr.", "Jose P. Rizal", "Juan Santiago", "Kayhacat", "Macasipac", "Masinao", "Matalinting", 
+                "Pao-o", "Parang ng Buho", "Poblacion Dos", "Poblacion Quatro", "Poblacion Tres", "Poblacion Uno", "Talangka", "Tungkod"]
+            },
+            "Santa Rosa": {
+                "zip_code": "4026",
+                "barangays": ["Aplaya", "Balibago", "Caingin", "Dila", "Dita", "Don Jose", 
+                "Ibaba", "Labas", "Macabling", "Malitlit", "Malusak", 
+                "Market Area (Poblacion)", "Pooc", "Pulong Santa Cruz", 
+                "Sinalhan", "Tagapo"]
+            },
+            "Siniloan": {
+                "zip_code": "4018",
+                "barangays": ["Acevida", "Bagumbarangay", "Buhay", "G. Redor (Poblacion)", 
+                "General Luna", "Halayhayin", "Liyang", "Macatad", "Magsaysay", 
+                "Mayatba", "Pandeno", "Salubungan", "Wawa"]
+            },
+            "Victoria": {
+                "zip_code": "4011",
+                "barangays": ["Banca-banca", "Daniw", "Masapang", "Nanhaya (Poblacion)", 
+                "Pagalangan", "San Benito", "San Felix", "San Francisco", "San Roque"]
+            }
+        }
+    };
+
+    const provinceSelect = document.getElementById("province");
+    const citySelect = document.getElementById("city");
+    const barangaySelect = document.getElementById("barangay");
+
+    // Get saved values from Jinja template (after a failed submit)
+    const savedProvince = "{{ form.province if form else '' }}";
+    const savedCity = "{{ form.city if form else '' }}";
+    const savedBarangay = "{{ form.barangay if form else '' }}";
+
+    function loadCities(province, selectedCity) {
+        const cities = addressData[province] || {};
+        citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
+        Object.keys(cities).forEach(city => {
+            const selected = city === selectedCity ? 'selected' : '';
+            citySelect.innerHTML += `<option value="${city}" ${selected}>${city}</option>`;
+        });
+    }
+
+    function loadBarangays(province, city, selectedBarangay) {
+        const cityData = addressData[province]?.[city] || {};
+        const barangays = cityData.barangays || [];
+        
+        // 1. Update ZIP Code
+        zipCodeInput.value = cityData.zip_code || '';
+
+        // 2. Update Barangays
+        barangaySelect.innerHTML = '<option value="">Select Barangay (Optional)</option>';
+        barangays.forEach(b => {
+            const selected = b === selectedBarangay ? 'selected' : '';
+            barangaySelect.innerHTML += `<option value="${b}" ${selected}>${b}</option>`;
+        });
+    }
+
+    // --- Event Listeners (Triggered by user interaction) ---
+    provinceSelect.addEventListener("change", () => {
+        loadCities(provinceSelect.value, null);
+        barangaySelect.innerHTML = '<option value="">Select Barangay (Optional)</option>';
+        zipCodeInput.value = ''; // Clear Zip Code
+    });
+
+    citySelect.addEventListener("change", () => {
+        loadBarangays(provinceSelect.value, citySelect.value, null);
+    });
+
+    // --- Initial Load Logic (Fires when the page first loads) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        if (savedProvince) {
+            loadCities(savedProvince, savedCity);
+            if (savedCity) {
+                loadBarangays(savedProvince, savedCity, savedBarangay);
+            } else {
+                zipCodeInput.value = ''; 
+            }
+        } else {
+            zipCodeInput.value = '';
+        }
+    });
+
+    // Contact Number Length Limit
+    const contact = document.getElementById("contact");
+    contact.addEventListener("input", () => {
+        if (contact.value.length > 11) {
+            contact.value = contact.value.slice(0, 11);
+        }
+    });
+
+    // Birthday → Age (Only computes the age)
+    const birthday = document.getElementById('birthday');
+    const age = document.getElementById('age');
+    birthday.addEventListener('change', () => {
+        const birthDate = new Date(birthday.value);
+        const today = new Date();
+        let computedAge = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            computedAge--;
+        }
+        age.value = computedAge >= 0 ? computedAge : '';
+    });
+
+    // --- 3. IMAGE PREVIEW LOGIC (ADDED) ---
+    const profileInput = document.getElementById('profilePicInput');
+    const profilePreview = document.getElementById('profilePreview');
+    const defaultIcon = document.getElementById('defaultIcon');
+
+    if (profileInput) {
+        profileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Hide icon, show image
+                defaultIcon.style.display = 'none';
+                profilePreview.style.display = 'block';
+                profilePreview.src = URL.createObjectURL(file);
+            }
+        });
+    }
+</script>
+{% endblock %}

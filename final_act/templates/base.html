@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Authallica{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- CUSTOM NAVBAR COLOR (Matches Login Card) --- */
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Navbar Hover Effects */
+        .nav-link {
+            transition: color 0.3s ease;
+            font-weight: 500;
+            color: rgba(255,255,255,0.85) !important;
+        }
+        .nav-link:hover {
+            color: #667eea !important; 
+            transform: translateY(-1px);
+        }
+        .active-link {
+            color: #667eea !important;
+            font-weight: bold;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('views_bp.landing_page') }}">
+                <i class="fas fa-gamepad text-warning me-2"></i>Authallica
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    
+                    {% if session.get('user_id') %}
+
+                        {% if session.get('role') != 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('views_bp.user_dashboard') }}">
+                                <i class="fas fa-home me-1"></i> Home
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('views_bp.games') }}">
+                                <i class="fas fa-rocket me-1"></i> Games
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('views_bp.profile') }}">
+                                <i class="fas fa-user-circle me-1"></i> Profile
+                            </a>
+                        </li>
+
+                        <li class="nav-item ms-lg-3">
+                            <a class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark" 
+                               href="{{ url_for('auth_bp.logout') }}"
+                               onclick="confirmLogout(event)">
+                                Logout <i class="fas fa-sign-out-alt ms-1"></i>
+                            </a>
+                        </li>
+
+                    {% else %}
+                        <li class="nav-item">
+                           <a class="btn btn-light btn-sm rounded-pill px-3 text-primary fw-bold" href="{{ url_for('auth_bp.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-light btn-sm rounded-pill px-3 text-primary fw-bold" href="{{ url_for('auth_bp.register') }}">Register</a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script id="flash-messages-data" type="application/json">
+        {{ get_flashed_messages(with_categories=true) | tojson | safe }}
+    </script>
+
+    <script>
+        // --- LOGOUT CONFIRMATION ---
+        function confirmLogout(event) {
+            event.preventDefault(); 
+            const logoutUrl = event.currentTarget.getAttribute('href'); 
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out of your session.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33', 
+                cancelButtonColor: '#3085d6', 
+                confirmButtonText: 'Yes, Logout!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = logoutUrl; 
+                }
+            });
+        }
+
+        // --- AUTOMATIC FLASH NOTIFICATIONS (CENTERED, NO BUTTON) ---
+        document.addEventListener("DOMContentLoaded", function() {
+            var dataElement = document.getElementById('flash-messages-data');
+            var messages = JSON.parse(dataElement.textContent);
+
+            if (messages && messages.length > 0) {
+                messages.forEach(function(item) {
+                    var category = item[0];
+                    var message = item[1];
+
+                    var iconType = 'info';
+                    var titleText = 'Notification';
+
+                    if (category === 'success') {
+                        iconType = 'success';
+                        titleText = 'Success!';
+                    } else if (category === 'error') {
+                        iconType = 'error';
+                        titleText = 'Error!';
+                    } else if (category === 'warning') {
+                        iconType = 'warning';
+                        titleText = 'Warning!';
+                    }
+
+                    // UPDATED: Center Position, No Button, Auto Close
+                    Swal.fire({
+                        title: titleText,
+                        text: message,
+                        icon: iconType,
+                        position: 'center',       // Places it in the middle
+                        showConfirmButton: false, // Hides the "OK" button
+                        timer: 2000,              // Auto closes after 2 seconds
+                        timerProgressBar: true
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Dashboard specific styles */
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Hero Section */
+    .hero-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 60px 40px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('https://www.transparenttextures.com/patterns/cubes.png');
+        opacity: 0.1;
+    }
+
+    .hero-banner h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+        position: relative;
+    }
+
+    .hero-banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+        position: relative;
+    }
+
+    /* Stats Row */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s;
+        border-left: 5px solid #667eea;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        background-color: #f0f2ff;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: #764ba2;
+        font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .stat-info p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* --- UPDATED: Main Content Grid (Responsive) --- */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr; /* Desktop: 2/3 Games, 1/3 Profile */
+        gap: 25px;
+        align-items: start;
+    }
+
+    /* Mobile / Tablet Layout */
+    @media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr; /* Stack them vertically on smaller screens */
+        }
+    }
+
+    /* Game Cards */
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .game-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: 0.3s;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .game-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .game-thumb {
+        height: 150px;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        background-color: #eee;
+    }
+
+    .game-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .game-card:hover .game-thumb img {
+        transform: scale(1.1);
+    }
+
+    .game-info {
+        padding: 15px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .game-info h5 {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .btn-play {
+        display: inline-block;
+        padding: 8px 20px;
+        background: #764ba2;
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-top: 10px;
+        transition: background 0.2s;
+    }
+
+    .btn-play:hover {
+        background: #5b3a7d;
+        color: white;
+    }
+
+    /* --- UPDATED: Profile Card Styles (Responsive & Modern) --- */
+    .profile-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px 25px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    @media (min-width: 993px) {
+        .profile-card:hover {
+            transform: translateY(-5px);
+        }
+    }
+
+    .profile-img-container {
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 20px auto;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 5px solid #f0f2ff;
+        box-shadow: 0 8px 16px rgba(118, 75, 162, 0.2);
+    }
+
+    .profile-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-name {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #2d3436;
+        margin-bottom: 5px;
+        letter-spacing: -0.5px;
+    }
+
+    .profile-details-list {
+        text-align: left;
+        margin-top: 25px;
+        border-top: 2px dashed #f1f2f6;
+        padding-top: 25px;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        color: #636e72;
+        font-size: 1rem;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+
+    .detail-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .detail-item i {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef2ff;
+        color: #667eea;
+        border-radius: 10px;
+        margin-right: 15px;
+        font-size: 1.1rem;
+    }
+
+    /* Edit Button Styling */
+    .btn-edit-profile {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border: 2px solid #667eea;
+        color: #667eea;
+        background: transparent;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+
+    .btn-edit-profile:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+    }
+</style>
+
+<div class="dashboard-container">
+    
+    {% if request.args.get('error') == 'access_denied' %}
+    <div class="alert alert-danger d-flex align-items-center mb-4 shadow-sm" role="alert" style="border-left: 5px solid #dc3545;">
+        <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
+        <div>
+            <h5 class="alert-heading fw-bold mb-1">Unauthorized Access Attempt Detected</h5>
+            <p class="mb-0">You do not have permission to access the Administrator Dashboard. This behavior has been logged.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="hero-banner">
+        <h1>Welcome back, {{ username }}!</h1>
+        <p>Ready to beat your high score today?</p>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ games_played }}</h3> 
+                <p>Games Played</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #ffd700;">
+            <div class="stat-icon" style="color: #ffd700;">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Global</h3> 
+                <p>Rank</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #28a745;">
+            <div class="stat-icon" style="color: #28a745;">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Active</h3> 
+                <p>Status</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        
+        <div class="games-section">
+            <h2 class="section-title"><i class="fas fa-rocket me-2"></i> Featured Games</h2>
+            <div class="games-grid">
+                
+                <div class="game-card">
+                    <div class="game-thumb"> <img src="{{ url_for('static', filename='img/shape_catcher.jpg') }}" alt="Shape Catcher" class="game-image">
+                    </div>
+                    <div class="game-info">
+                        <h5>Shape Catcher</h5>
+                        <p class="text-muted small">Test your reflexes!</p>
+                        <a href="{{ url_for('views_bp.play_game', game_name='Shape Catcher') }}"></a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-thumb">
+                        <img src="{{ url_for('static', filename='img/space_war_2p.jpg') }}" alt="Space War 2P" class="game-image">
+                    </div>
+                    <div class="game-info">
+                        <h5>Spacewar 2 player</h5>
+                        <p class="text-muted small">Defend the galaxy together.</p>
+                        <a href="{{ url_for('views_bp.play_game', game_name='Space War 2P') }}"></a>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-thumb">
+                        <img src="{{ url_for('static', filename='img/spacewar.jpg') }}" alt="Space War" class="game-image">
+                    </div>
+                    <div class="game-info">
+                        <h5>Spacewar</h5>
+                        <p class="text-muted small">Defend the galaxy.</p>
+                        <a href="{{ url_for('views_bp.play_game', game_name='Space War') }}"></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2 class="section-title"><i class="fas fa-id-card me-2"></i> Player Profile</h2>
+            
+            <div class="profile-card">
+                <div class="profile-img-container">
+                    <img src="{{ profile_pic }}" alt="User Avatar">
+                </div>
+
+                <div class="profile-name">{{ full_name }}</div> 
+                <div class="profile-details-list">
+                    
+                    <div class="detail-item">
+                        <i class="fas fa-user-tag"></i>
+                        <span>{{ username }}</span> 
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>{{ age if age else 'Not Set' }} Years Old</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
