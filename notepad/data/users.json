@@ -1,0 +1,34 @@
+[
+    {
+        "username": "rassel",
+        "firstname": "Rassel",
+        "middlename": "Reyes",
+        "lastname": "Dizon",
+        "province": "Laguna",
+        "city": "Santa Cruz",
+        "barangay": "Duhat",
+        "contact": "09127414255",
+        "birthday": "2005-09-09",
+        "email": "rasseldizon@gmail.co",
+        "password": "scrypt:32768:8:1$6XkMBy0eUYZiCcSc$55f74e41e23f06af93e58a040940e5a890e72141085cbec7d730aebacc81ee48ce40fafe7eea5bd420e15bf6db50093ad342e08c4a23bb99255ba333adff11ed",
+        "confirm_password": "09127414255",
+        "age": "20",
+        "zip_code": "4009"
+    },
+    {
+        "username": "Rassel123",
+        "firstname": "Rassel John",
+        "middlename": "Reyes",
+        "lastname": "Dizon",
+        "province": "Laguna",
+        "city": "Santa Cruz",
+        "barangay": "Santisima Cruz",
+        "contact": "09505371785",
+        "birthday": "2005-09-09",
+        "email": "rasseldizon@gmail.com",
+        "password": "scrypt:32768:8:1$vJIE94X4gsw4REjB$360c3e12ae769f2da06079d20b12a993cf9bc680740fd0d8944bd504af2ec37de1d9d96822712c8eb2e3e26d6f030451d00d7ddc5fb5e9cee6414e723cc33ef3",
+        "confirm_password": "123456789",
+        "age": "20",
+        "zip_code": "4009"
+    }
+]

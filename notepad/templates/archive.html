@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>Archived</h2>
+<ul>
+{% for n in notes %}
+  <li style="background-color:#2c2c2e; padding:1rem; border-radius:14px; margin-bottom:0.8rem; box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+    
+    <!-- Title -->
+    <div style="color:#f5f5f7; font-weight:600; font-size:1.1rem;">{{ n.title }}</div>
+
+    <!-- Content preview (show only a few lines) -->
+    <div style="
+      color:#a1a1a6;
+      margin-top:5px;
+      white-space:pre-wrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      display:-webkit-box;
+      -webkit-box-orient:vertical;
+      -webkit-line-clamp:2;
+      line-clamp:2; /* Standard property for future compatibility */
+    ">
+      {{ n.content }}
+    </div>
+
+    <!-- Buttons -->
+    <div style="margin-top:10px;">
+      <!-- Restore button -->
+      <form method="POST"
+            action="{{ url_for('main.archive_restore', note_id=n.id) }}"
+            style="display:inline;"
+            onsubmit="handleRestoreConfirm(event, this)">
+        <button type="submit" 
+                style="background:#bd0fa0; border:none; padding:8px 14px; border-radius:10px; font-weight:bold; cursor:pointer;">
+          Restore
+        </button>
+      </form>
+
+      <!-- Delete button -->
+      <form method="POST"
+            action="{{ url_for('main.archive_delete', note_id=n.id) }}"
+            style="display:inline;"
+            onsubmit="handleDeleteConfirm(event, this)">
+        <button type="submit" 
+                style="background:#bd0fa0; border:none; padding:8px 14px; border-radius:10px; font-weight:bold; cursor:pointer;">
+          Delete
+        </button>
+      </form>
+    </div>
+  </li>
+{% else %}
+  <li><small>No archived notes</small></li>
+{% endfor %}
+</ul>
+{% endblock %}

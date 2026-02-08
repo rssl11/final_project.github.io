@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>All Notes</h2>
+<form method="post" novalidate>
+  <input name="title" placeholder="Title">
+  <textarea name="content" rows="4" placeholder="Type your note..."></textarea>
+  <button type="submit">Add Note</button>
+</form>
+<hr>
+<ul>
+{% for n in notes %}
+  <li style="margin-bottom: 20px;">
+    <strong>{{ n.title }}</strong><br>
+    <small>{{ n.content }}</small><br>
+
+    <!-- 🔹 Buttons container -->
+    <div style="margin-top: 10px;">
+      <form method="get" 
+            action="{{ url_for('main.edit_note', note_id=n.id) }}" 
+            style="display:inline;">
+        <button type="submit" 
+                style="background:#bd0fa0; border:none; padding:8px 14px; border-radius:10px; font-weight:bold; cursor:pointer;">
+          Edit
+        </button>
+      </form>
+
+      <form method="post"
+            action="{{ url_for('main.delete_note', note_id=n.id) }}"
+            style="display:inline; margin-top:8px;"
+            onsubmit="handleArchiveConfirm(event, this)">
+        <button type="submit">Archive</button>
+      </form>
+    </div>
+  </li>
+{% else %}
+  <li><small>No active notes</small></li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>OTP Verification</h2>
+
+{% if session.get('profile_otp') %}
+    <div style=" margin-bottom: 30px; ">
+        Your OTP is: {{ session.get('profile_otp') }}
+    </div>
+{% endif %}
+
+<form id="verifyForm" method="POST" action="{{ url_for('main.profile_otp_verify') }}">
+  <label for="otp">OTP Code:</label>
+  <input type="text" id="otp" name="otp" placeholder="Enter OTP" required maxlength="6" autocomplete="off" />
+  <button type="submit">Confirm</button>
+</form>
+
+<p>OTP expires in: <span id="timer"></span></p>
+
+<form id="resendForm" action="{{ url_for('auth_bp.resend_profile_otp') }}" method="post" style="margin-top: 15px; display:none;">
+  <button type="submit">Generate New OTP</button>
+</form>
+
+{# Timer Script #}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Get remaining OTP seconds from Flask
+  let timeLeft = parseInt("{{ otp_time|default(0)|int }}");
+  const timerEl = document.getElementById("timer");
+  const resendForm = document.getElementById("resendForm");
+  const verifyForm = document.getElementById("verifyForm");
+
+  // Format seconds to mm:ss
+  function format(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }
+
+  // Countdown timer
+  function tick() {
+    if (timeLeft <= 0) {
+      timerEl.textContent = "Expired";
+      resendForm.style.display = "block";
+      verifyForm.querySelector("button").disabled = true;
+    } else {
+      timerEl.textContent = format(timeLeft);
+      timeLeft--;
+      setTimeout(tick, 1000);
+    }
+  }
+
+  // Start timer if available
+  tick();
+});
+</script>
+{% endblock %}  

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block body %}
+
+<style>
+.field-error {
+    color: #9b5de5; 
+    font-size: 14px;
+    margin-top: -10px; 
+    margin-bottom: 0px; 
+    padding-left: 5px; 
+    font-weight: 500;
+}
+.field-error.password-error {
+    margin-top: -20px; 
+    margin-bottom: 0px;
+}
+</style>
+
+<h2>Login</h2>
+<form method="POST" action="{{ url_for('auth_bp.login') }}" novalidate>
+    <input type="email" name="email" placeholder="Email" required
+           value="{{ entered_email if entered_email else '' }}">
+           
+    {% if errors.email %}
+        <div class="field-error">{{ errors.email }}</div>
+    {% endif %}
+
+    <div style="position: relative; width: 100%; margin-bottom: 12px;">
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        placeholder="Password" 
+        required
+        value="{{ entered_password if entered_password else '' }}"
+        style="width: 92%; padding: 10px 40px 10px 10px; border: none; border-radius: 10px; background-color: #3a3a3c; color: #f5f5f7; font-size: 15px;"
+      >
+      <span 
+        onclick="togglePassword('password', this)" 
+        style="
+          position: absolute; 
+          right: 10px; 
+          top: 50%; 
+          transform: translateY(-50%); 
+          cursor: pointer; 
+          user-select: none;
+          font-size: 18px;
+        "
+      >👁️</span>
+    </div>
+    
+    {% if errors.password %}
+        <div class="field-error password-error">{{ errors.password }}</div>
+    {% endif %}
+
+    <button type="submit">Login</button>
+</form>
+
+<small>
+  <a href="{{ url_for('auth_bp.forgot') }}" style="color:var(--accent)">Forgot your password?</a><br>
+  <a href="{{ url_for('auth_bp.register') }}" style="color:var(--accent)">Register</a>
+</small>
+
+<script>
+function togglePassword(id, el) {
+  const input = document.getElementById(id);
+  if (input.type === "password") {
+    input.type = "text";
+    el.textContent = "🙈";
+  } else {
+    input.type = "password";
+    el.textContent = "👁️";
+  }
+}
+</script>
+{% endblock %}

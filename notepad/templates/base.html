@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Notepad</title>
+  <style>
+    :root {
+      --bg: #0b0b0d;            /* deep black background */
+      --card: #1a1a1d;          /* dark grayish card */
+      --accent: #9b5de5;        /* main purple accent */
+      --accent-hover: #c77dff;  /* lighter purple hover */
+      --text: #f5f5f7;          /* main text */
+      --subtext: #a1a1a6;       /* secondary text */
+      --radius: 14px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* General layout */
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Navbar */
+    header, nav {
+      background-color: #000;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(155, 93, 229, 0.2);
+    }
+
+    nav a {
+      color: var(--accent);
+      text-decoration: none;
+      margin-right: 1rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    /* Content layout */
+    main {
+      padding: 1.5rem;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    h2 {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    form {
+      background-color: var(--card);
+      padding: 1rem;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      box-shadow: 0 2px 10px rgba(155, 93, 229, 0.15);
+    }
+
+    input, textarea, button {
+      background: #2a2a2e;
+      border: none;
+      color: var(--text);
+      padding: 0.6rem;
+      border-radius: var(--radius);
+      font-size: 1rem;
+    }
+
+    input:focus, textarea:focus {
+      outline: 2px solid var(--accent);
+    }
+
+    button {
+      background-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--accent-hover);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: var(--card);
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.7rem;
+      box-shadow: 0 2px 6px rgba(155, 93, 229, 0.1);
+    }
+
+    small {
+      color: var(--subtext);
+    }
+
+    /* Flash messages */
+    .flash-message {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 500;
+      color: #fff;
+      animation: fadeIn 0.4s ease, fadeOut 0.5s ease 3.5s forwards;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    .flash-message.success { background: #9b5de5 }
+    .flash-message.info { background: #9b5de5; }
+    .flash-message.warning { background: #9b5de5; color: #000; }
+    .flash-message.error { background: #9b5de5; }
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+/* 🔹 Flash message container - centered */
+#flash-container {
+  position: fixed;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+/* 🔹 Custom modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+.modal-content {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+  color: var(--text);
+  width: 300px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+.modal-buttons {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+.modal-buttons button {
+  background: var(--accent);
+  border: none;
+  color: #000;
+  font-weight: 600;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.modal-buttons button:hover {
+  opacity: 0.8;
+}
+
+</style>
+</head>
+<body>
+
+<!-- 🔹 Flash Message Container -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- Navbar -->
+{% if session.username %}
+<nav>
+  <div>📜 Notepad</div>
+  <div>
+    <a href="{{ url_for('main.home') }}">Home</a>
+    <a href="{{ url_for('main.archive') }}">Archive</a>
+    <a href="{{ url_for('main.profile') }}">Profile</a>
+    <a href="{{ url_for('auth_bp.logout') }}" onclick="handleLogoutConfirm(event, this.href)">Logout</a>
+  </div>
+</nav>
+{% endif %}
+
+<!-- Main Content -->
+<main>
+  {% block body %}{% endblock %}
+</main>
+
+<!-- Auto-remove flash messages -->
+<script>
+setTimeout(() => {
+  document.querySelectorAll('.flash-message').forEach(el => el.remove());
+}, 4000);
+</script>
+
+<!-- 🔹 Custom confirmation modal -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <p id="confirmMessage">Are you sure?</p>
+    <div class="modal-buttons">
+      <button id="confirmYes">Yes</button>
+      <button id="confirmNo">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function customConfirm(message, callback) {
+  const modal = document.getElementById('confirmModal');
+  const msg = document.getElementById('confirmMessage');
+  const yes = document.getElementById('confirmYes');
+  const no = document.getElementById('confirmNo');
+
+  msg.textContent = message;
+  modal.style.display = 'flex';
+
+  yes.onclick = () => {
+    modal.style.display = 'none';
+    callback(true);
+  };
+  no.onclick = () => {
+    modal.style.display = 'none';
+    callback(false);
+  };
+}
+
+</script>
+
+<script>
+// ✅ Use this for Archive confirmation
+function handleArchiveConfirm(event, form) {
+  event.preventDefault();
+  customConfirm("Are you sure you want to archive this note?", (confirmed) => {
+    if (confirmed) form.submit();
+  });
+}
+
+// ✅ Use this for Restore confirmation
+function handleRestoreConfirm(event, form) {
+  event.preventDefault();
+  customConfirm("Are you sure you want to restore this note?", (confirmed) => {
+    if (confirmed) form.submit();
+  });
+}
+
+// ✅ Use this for Delete confirmation
+function handleDeleteConfirm(event, form) {
+  event.preventDefault();
+  customConfirm("Are you sure you want to permanently delete this note?", (confirmed) => {
+    if (confirmed) form.submit();
+  });
+}
+
+function handleLogoutConfirm(event, href) {
+  event.preventDefault();
+  customConfirm("Are you sure you want to logout?", (confirmed) => {
+    if (confirmed) {
+      window.location.href = href;
+    }
+  });
+}
+
+</script>
+
+</body>
+</html>

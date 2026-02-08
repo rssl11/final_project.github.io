@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>OTP Verification</h2>
+
+<style>
+/* Add the field-error styling for the OTP input */
+.field-error {
+    color: #9b5de5;
+    font-size: 14px;
+    margin-top: -6px; 
+    margin-bottom: 0px; 
+    padding-left: 5px; 
+    font-weight: 500;
+}
+</style>
+
+<div id="otp-data" data-otp-time="{{ otp_time|default(0)|int }}"></div>
+
+{% if session.get('reset_otp') %}
+    <div>
+        Your OTP is: {{ session.get('reset_otp') }}
+    </div>
+{% endif %}
+
+<p>OTP expires in: <span id="timer"></span></p>
+
+<form id="verifyForm" method="post" novalidate>
+  <input name="otp" placeholder="Enter 6-digit OTP" required
+  value="{{ entered_otp if entered_otp else '' }}">
+  
+  {% if otp_error %}
+      <div class="field-error">{{ otp_error }}</div>
+  {% endif %}
+  
+  <button type="submit">Verify</button>
+</form>
+
+<form id="resendForm" action="{{ url_for('auth_bp.resend_otp') }}" method="post" style="display:none;">
+  <button type="submit">Generate New OTP</button>
+</form>
+
+<script>
+const otpDataElem = document.getElementById('otp-data');
+let timeLeft = parseInt(otpDataElem.dataset.otpTime || "0", 10);
+const timerElement = document.getElementById('timer');
+const resendForm = document.getElementById('resendForm');
+const verifyForm = document.getElementById('verifyForm');
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+function countdown() {
+  if (timeLeft <= 0) {
+    timerElement.textContent = "Expired";
+    resendForm.style.display = "block";
+    verifyForm.querySelector("button").disabled = true;
+  } else {
+    timerElement.textContent = formatTime(timeLeft);
+    timeLeft--;
+    setTimeout(countdown, 1000);
+  }
+}
+countdown();
+</script>
+{% endblock %}

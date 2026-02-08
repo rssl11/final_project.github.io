@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+<style>
+    body {
+        background-color: #1c1c1e;
+        color: #f5f5f7;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* ensures it fits any screen height */
+        margin: 0;
+        padding: 20px; /* adds breathing space on smaller screens */
+        box-sizing: border-box;
+    }
+
+    .container {
+        background-color: #2c2c2e;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        width: 100%;
+        max-width: 400px; /* responsive width, perfect size */
+    }
+
+    h2 {
+        text-align: center;
+        color: #9b5de5;
+        margin-bottom: 20px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 12px;
+        border: none;
+        border-radius: 10px;
+        background-color: #3a3a3c;
+        color: #f5f5f7;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+
+    input:focus, select:focus {
+        outline: 2px solid #9b5de5;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background-color: #9b5de5;
+        color: #000;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    button:hover {
+        background-color: #9b5de5;
+    }
+
+    .note {
+        text-align: center;
+        font-size: 14px;
+        color: #a1a1a1;
+        margin-top: 10px;
+    }
+
+    .flash {
+        background-color: #9b5de5;
+        color: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+    /* 📱 Responsive adjustments */
+    @media (max-width: 480px) {
+        .container {
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 90%;
+        }
+
+        input, select, button {
+            font-size: 14px;
+            padding: 10px;
+        }
+    }
+</style>
+
+<style>
+/* Centered Flash Messages - match base.html */
+#flash-container {
+  position: fixed;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.flash-message {
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 500;
+  color: #fff;
+  background: #9b5de5; /* default red for errors */
+  animation: fadeIn 0.4s ease, fadeOut 0.5s ease 3.5s forwards;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+.field-error {
+    color: #9b5de5; /* Red error text */
+    font-size: 14px;
+    margin-top: -8px; /* Pull error text up slightly */
+    margin-bottom: 12px; /* Add space before the next input */
+    padding-left: 5px; /* Slight indentation */
+    font-weight: 500;
+}
+
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <h2>Create Account</h2>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth_bp.register') }}" novalidate>
+          
+          {# Username #}
+          <input type="text" name="username" placeholder="Username" 
+              value="{{ form.username if form else '' }}"
+              title="Username must start with a letter and can include letters, numbers, dots, and underscores"
+              required>
+            {% if errors.username %}
+                <div class="field-error">{{ errors.username }}</div>
+            {% endif %}
+          
+          {# First Name #}
+          <input type="text" name="firstname" placeholder="First Name"
+              value="{{ form.firstname if form else '' }}"
+              title="Start with a capital letter, at least 2 characters, letters and spaces only" required>
+            {% if errors.firstname %}
+                <div class="field-error">{{ errors.firstname }}</div>
+            {% endif %}
+          
+          {# Middle Name #}
+          <input type="text" name="middlename" placeholder="Middle Name (Optional)"
+              value="{{ form.middlename if form else '' }}"
+              title="Start with a capital letter, at least 2 characters, letters and spaces only">
+            {% if errors.middlename %}
+                <div class="field-error">{{ errors.middlename }}</div>
+            {% endif %}
+
+          {# Last Name #}
+          <input type="text" name="lastname" placeholder="Last Name"
+              value="{{ form.lastname if form else '' }}"
+              title="Start with a capital letter, at least 2 characters, letters and spaces only" required>
+            {% if errors.lastname %}
+                <div class="field-error">{{ errors.lastname }}</div>
+            {% endif %}
+
+          {# Province #}
+          <select id="province" name="province" required>
+              <option value="">Select Province</option>
+              <option value="Laguna" {% if form and form.province == 'Laguna' %}selected{% endif %}>Laguna</option>
+          </select>
+            {% if errors.province %}
+                <div class="field-error">{{ errors.province }}</div>
+            {% endif %}
+
+          {# City #}
+          <select id="city" name="city" required>
+              <option value="">Select City/Municipality</option>
+              {% if form and form.city %}
+                <option value="{{ form.city }}" selected>{{ form.city }}</option>
+              {% endif %}
+          </select>
+            {% if errors.city %}
+                <div class="field-error">{{ errors.city }}</div>
+            {% endif %}
+
+          {# Barangay #}
+          <select id="barangay" name="barangay">
+              <option value="">Select Barangay</option>
+              {% if form and form.barangay %}
+                <option value="{{ form.barangay }}" selected>{{ form.barangay }}</option>
+              {% endif %}
+          </select>
+          
+          {# Zip Code #}
+          <input type="text" id="zip_code" name="zip_code" placeholder="Zip Code" readonly
+              value="{{ form.zip_code if form else '' }}">
+
+          {# Contact #}
+          <input type="text" id="contact" name="contact" placeholder="09XXXXXXXXX"
+              value="{{ form.contact if form else '' }}"
+              maxlength="11"
+              required>
+            {% if errors.contact %}
+                <div class="field-error">{{ errors.contact }}</div>
+            {% endif %}
+
+          {# Email #}
+          <input type="email" name="email" placeholder="example@email.com"
+              value="{{ form.email if form else '' }}"
+              required>
+            {% if errors.email %}
+                <div class="field-error">{{ errors.email }}</div>
+            {% endif %}
+
+          {# Birthday #}
+          <input type="date" id="birthday" name="birthday"
+              value="{{ form.birthday if form else '' }}" required>
+            {% if errors.birthday %}
+                <div class="field-error">{{ errors.birthday }}</div>
+            {% endif %}
+
+          {# Age (Readonly) #}
+          <input type="text" id="age" name="age"
+              value="{{ form.age if form else '' }}"
+              placeholder="Age" readonly>
+
+        {# Password Field #}
+        <div style="position: relative; width: 100%; margin-bottom: 12px;">
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Enter password (min 8 chars)" 
+            required
+            value="{{ form.password if form and form.password else '' }}"
+            style="width: 100%; padding: 10px 40px 10px 10px; border: none; border-radius: 10px; background-color: #3a3a3c; color: #f5f5f7; font-size: 15px;"
+          >
+          <span 
+            onclick="togglePassword('password', this)" 
+            style="
+              position: absolute; 
+              right: 10px; 
+              top: 50%; 
+              transform: translateY(-50%); 
+              cursor: pointer; 
+              user-select: none;
+              font-size: 18px;
+            "
+          >👁️</span>
+        </div>
+        {% if errors.password %}
+            <div class="field-error">{{ errors.password }}</div>
+        {% endif %}
+
+        {# Confirm Password Field #}
+        <div style="position: relative; width: 100%; margin-bottom: 12px;">
+          <input 
+            type="password" 
+            id="confirm_password" 
+            name="confirm_password" 
+            placeholder="Confirm password" 
+            required
+            value="{{ form.confirm_password if form and form.confirm_password else '' }}"
+            style="width: 100%; padding: 10px 40px 10px 10px; border: none; border-radius: 10px; background-color: #3a3a3c; color: #f5f5f7; font-size: 15px;"
+          >
+          <span 
+            onclick="togglePassword('confirm_password', this)" 
+            style="
+              position: absolute; 
+              right: 10px; 
+              top: 50%; 
+              transform: translateY(-50%); 
+              cursor: pointer; 
+              user-select: none;
+              font-size: 18px;
+            "
+          >👁️</span>
+        </div>
+        {# The confirm_password error (mismatch/length) is intentionally mapped to errors.password #}
+
+        <script>
+        function togglePassword(id, el) {
+          const input = document.getElementById(id);
+          if (input.type === "password") {
+            input.type = "text";
+            el.textContent = "🙈";
+          } else {
+            input.type = "password";
+            el.textContent = "👁️";
+          }
+        }
+        </script>
+
+          <button type="submit">Register</button>
+      </form>
+
+        <div class="note">
+            Already have an account? 
+            <a href="{{ url_for('auth_bp.login') }}" style="color:#9b5de5;text-decoration:none;">Login</a>
+        </div>
+    </div>
+
+    <script>
+       
+// Get the new zip code element
+const zipCodeInput = document.getElementById("zip_code");
+
+// 💡 FIXED: Consistent Address Data Structure (City is an object with zip_code and barangays)
+const addressData = {
+    "Laguna": {
+      "Alaminos":{
+        "zip_code": "4001",
+        "barangays":["Barangay I (Poblacion)", "Barangay II (Poblacion)", "Barangay III (Poblacion)", 
+        "Barangay IV (Poblacion)", "Del Carmen", "Palma", "San Agustin (Antipolo)", "San Andres", "San Benito (Palita)", 
+        "San Gregorio", "San Ildefonso", "San Juan", "San Miguel", "San Roque", "Santa Rosa"]
+      },
+      "Bay": {
+        "zip_code": "4033",
+        "barangays": [
+          "Bitin", "Calo", "Dila", "Maitim", "Masaya", "Paciano Rizal", 
+          "Puypuy", "San Agustin", "San Antonio", "San Isidro", 
+          "San Nicolas", "Santa Cruz", "Santo Domingo", "Tagumpay", "Tranca"
+        ]
+      },    
+      
+      "Biñan": {
+        "zip_code": "4024",
+        "barangays": [
+          "Canlalay", "San Antonio", "San Francisco", "San Jose", "San Vicente", 
+          "Santo Domingo", "Sto. Niño", "Zapote", "Ganado", "Dela Paz", 
+          "Langkiwa", "Malaban", "Malamig", "Mampalasan", "Platero", 
+          "San Gabriel", "Santo Tomas", "Timbao", "Tubigan"
+        ]
+      },
+
+      "Calamba": {
+        "zip_code": "4027",
+        "barangays": [
+          "Banlic", "Bagong Kalsada", "Batino", "Bubuyan", "Bunggo", 
+          "Burol", "Camaligan", "Canlubang", "Halang", "Hornalan", 
+          "Kay-Anlog", "Laguerta", "La Mesa", "Lawa", "Lecheria", 
+          "Lingga", "Looc", "Mabato", "Majada Out", "Makiling", 
+          "Mapagong", "Masili", "Maunong", "Milagrosa", "Paciano Rizal", 
+          "Palingon", "Palo-Alto", "Pansol", "Parian", "Prinza", 
+          "Punta", "Puting Lupa", "Real", "Saimsim", "Sampiruhan", 
+          "San Benito", "San Cristobal", "San Jose", "San Juan", 
+          "Sirang Lupa", "Sucol", "Turbina", "Ulango", "Uwisan"
+        ]
+      },
+
+      "Calauan": {
+        "zip_code": "4012",
+        "barangays": [
+          "Balayhangin", "Bangyas", "Dayap", "Hanggan", "Imok", 
+          "Kanluran (Pob.)", "Lamot 1", "Lamot 2", "Limao", "Mabacan", 
+          "Masiit", "Paliparan", "Perez", "Prinza", "San Isidro", 
+          "Santo Tomas", "Silangan"
+        ]
+      },
+
+      "Cabuyao": {
+        "zip_code": "4025",
+        "barangays": [
+          "Baclaran", "Banay-Banay", "Banlic", "Bigaa", "Butong", "Casile", 
+          "Diezmo", "Gulod", "Mamatid", "Marinig", "Niugan", 
+          "Pittland", "Pulo", "Sala", "San Isidro", 
+          "Barangay Uno (Pob.)", "Barangay Dos (Pob.)", "Barangay Tres (Pob.)"
+        ]
+      },
+
+      "Cavinti": {
+        "zip_code": "4013",
+        "barangays": [
+          "Anglas", "Bangco", "Bukal", "Cansuso", "Duhat", "Inao-Awan", 
+          "Kanluran Talaongan", "Labayo", "Layasin", "Mahipon", "Paowin", 
+          "Poblacion", "Silangan Talaongan", "Sumucab"
+        ]
+      },
+
+      "Famy": {
+        "zip_code": "4021",
+        "barangays": [
+          "Asana", "Bagong Pag-Asa", "Balitoc", "Banaba", "Caballero", 
+          "Calumpang", "Kapatalan", "Kataypuanan", "Tunhac", "Poblacion", "Tunhac II"
+        ]
+      },
+
+      "Kalayaan": {
+        "zip_code": "4010",
+        "barangays": [
+          "Longos", "San Antonio", "San Juan", "San Pablo Norte", "San Pablo Sur"
+        ]
+      },    
+
+      "Liliw": {
+        "zip_code": "4004",
+        "barangays": [
+          "Bagong Anyo", "Bayate", "Bongkol", "Cabezang San Juan", "Cabaong", 
+          "Calumpang", "Duhat", "Ibabang Palina", "Ibabang San Roque", 
+          "Ibabang Taykin", "Ilayang Palina", "Ilayang San Roque", 
+          "Ilayang Taykin", "Kanlurang Bukal", "Laguan", "Luquin", 
+          "Malabo-Kaabay", "Masikap", "Novaliches", "Oples", "Pag-asa", 
+          "Palina", "San Isidro", "Silangan Bukal", "Tuy-Baño"
+        ]
+      },
+
+      "Los Baños": {
+        "zip_code": "4030",
+        "barangays": [
+          "Anos", "Bagong Silang", "Bambang", "Batong Malake", "Baybayin", 
+          "Bayog", "Lalakay", "Maahas", "Malinta", "Mayondon", 
+          "Putho-Tuntungin", "San Antonio", "Tadlac", "Timugan"
+        ]
+      },
+
+      "Luisiana": {
+        "zip_code": "4032",
+        "barangays": [
+          "De La Paz", "Don Juan", "Lewin", "Malulut", "San Antonio", 
+          "San Buenaventura", "San Diego", "San Isidro", "San Jose", 
+          "San Luis", "San Pablo", "San Pedro", "Santo Domingo", 
+          "Santo Tomas", "Zone I (Poblacion)", "Zone II (Poblacion)", 
+          "Zone III (Poblacion)", "Zone IV (Poblacion)"
+        ]
+      },
+
+      "Lumban": {
+        "zip_code": "4014",
+        "barangays": [
+          "Balimbingan", "Bagong Silang", "Caliraya", "Concepcion", "Lewin", 
+          "Maracta", "Maytalang I", "Maytalang II", "Primera Parang", 
+          "Remedios I", "Remedios II", "Salac", "Sebitanan", "Silangan", "Wawa"
+        ]
+      },
+
+      "Mabitac": {
+        "zip_code": "4015",
+        "barangays": [
+          "Amuyong", "Lambac", "Libis ng Nayon", "Lucong", "Maligaya", 
+          "Masikap", "Pag-Asa", "Paowin", "Poblacion", "Sagrada Familia", 
+          "San Antonio", "San Miguel", "Santa Catalina"
+        ]
+      },
+
+      "Magdalena": {
+        "zip_code": "4028",
+        "barangays": [
+          "Alipit", "Bambang", "Buenavista", "Buo", "Bubukal", 
+          "Buenlag", "Ilog", "Malaking Ambling", "Malinao", 
+          "Poblacion 1", "Poblacion 2", "Sabang", "Salinas", "Tanawan", "Tipunan"
+        ]
+      },
+
+      "Majayjay": {
+        "zip_code": "4005",
+        "barangays": [
+          "Bakia", "Balanac", "Botocan", "Buñgan", "Coralao", "Gagalot", 
+          "Ilayang Bayucain", "Ibabang Bayucain", "Malinao", "May-It", 
+          "Olla", "Panglan", "Poblacion Barangay 1", "Poblacion Barangay 2", 
+          "Poblacion Barangay 3", "Poblacion Barangay 4", "San Francisco", 
+          "San Isidro", "San Miguel", "Suba"
+        ]
+      },
+
+      "Nagcarlan": {
+        "zip_code": "4002",
+        "barangays": [
+          "Alibungbungan", "Alumbrado", "Babayuan", "Balayong", "Bambang", 
+          "Banilad", "Bunga", "Cabuyew", "Calumpang", "Kanluran (Poblacion 1)", 
+          "Ibabang Amonoy", "Ibabang Bukal", "Ibabang Kabatete", 
+          "Ibabang Kuiit", "Ilayang Amonoy", "Ilayang Bukal", "Ilayang Kabatete", 
+          "Ilayang Kuiit", "Manaol", "Maravilla", "Palayan", "Sabang", 
+          "San Francisco", "Santa Lucia", "Silangan (Poblacion 2)", "Sinipian", "Sibulan"
+        ]
+      },
+
+      "Paete": {
+        "zip_code": "4016",
+        "barangays": [
+          "Bagumbayan", "Bangkusay", "Ermita", "Ibaba del Norte", 
+          "Ibaba del Sur", "Ilaya del Norte", "Ilaya del Sur", 
+          "Maytoong", "Quinale", "Rizal"
+        ]
+      },
+
+      "Pagsanjan": {
+        "zip_code": "4008",
+        "barangays": [
+          "Biñan", "Cabanbanan", "Calusiche", "Dingin", "Lambac", 
+          "Layugan", "Maulawin", "Pinagsanjan", "Poblacion I", 
+          "Poblacion II", "Sabang", "Sampaloc"
+        ]
+      },
+
+      "Pakil": {
+        "zip_code": "4017",
+        "barangays": [
+          "Baño", "Burgos", "Casinsin", "Dorado", "Gaza", 
+          "Rizal", "San Isidro", "Taft", "Tavera", "Taft I", "Taft II"
+        ]
+      },
+
+      "Pangil": {
+        "zip_code": "4018",
+        "barangays": [
+          "Balian", "Dambo", "Dorado", "Galalan", "Isla", "Mabato-Azufre", 
+          "Natividad", "San Isidro", "Sulib"
+        ]
+      },
+
+      "Pila": {
+        "zip_code": "4010",
+        "barangays": [
+          "Aplaya", "Bagong Pook", "Bukal", "Bulilan Norte (Poblacion)", 
+          "Bulilan Sur (Poblacion)", "Concepcion", "Labuin", "Linga", 
+          "Masico", "Mojon", "Pansol", "Pinagbayanan", "San Antonio", 
+          "San Miguel", "Santa Clara Norte", "Santa Clara Sur", "Tubuan"
+        ]
+      },
+
+      "Rizal": {
+        "zip_code": "4031",
+        "barangays": [
+          "Antipolo", "Entablado", "Pauli 1", "Pauli 2", "East Poblacion", 
+          "West Poblacion", "Talortor", "Tuy", "Limocon"
+        ]
+      },
+
+      "San Pablo": {
+        "zip_code": "4000",
+        "barangays": ["Atisan", "Bautista", "Concepcion (Bunot)", "Del Remedio (Wawa)", "Dolores", "I-A (Sambat)", 
+          "I-B (City Sub Riverside)", "I-C (Bagong Bayan)", "II-A (Triangulo/Guadalupe 2)", "II-B (Guadalupe 1)", 
+          "II-C (Unson)", "II-D (Bulante)", "II-E (San Anton)", "II-F (Villa Rey)", "III-A (Hermanos Belen)", "III-B", 
+          "III-C (Labak/De Roma)", "III-D (Villongco)", "III-E", "III-F (Balagtas)", "IV-A", "IV-B", "IV-C", "V-A", "V-B", 
+          "V-C", "V-D", "VI-A (Mavenida)", "VI-B (Sabang Mabini)", "VI-C (Bagong Pook)", "VI-D (Lakeside)", "VI-E (YMCA)", 
+          "VII-A (P.Alcantara)", "VII-B", "VII-C", "VII-D", "VII-E", "San Antonio 1 (Balanga)", "San Antonio 2 (Sapa)", 
+          "San Bartolome (Matang-ag)", "San Buenaventura (Palakpakin)", "San Crispin (Lumbangan)", "San Cristobal", 
+          "San Diego (Tiim)", "San Francisco (Calihan)", "San Gabriel (Butucan)", "San Gregorio", "San Ignacio", 
+          "San Isidro (Balagbag)", "San Joaquin", "San Jose (Malamig)", "San Juan (Putol)", "San Lorenzo (Saluyan)", 
+          "San Lucas 1 (Malinaw)", "San Lucas 2 (Malinaw)", "San Marcos (Tikew)", "San Mateo (Imok)", "San Miguel (Balatuin)", 
+          "San Nicolas (Mag-ampon)", "San Pedro", "San Rafael (Buluburan)", "San Roque (Sambat)", "San Vicente", "Santa Ana", 
+          "Santa Catalina (Sandig)", "Santa Cruz (Putol)", "Santa Elena", "Santa Filomena (Banlagin)", "Santa Isabel", 
+          "Santa Maria", "Santa Maria Magdalena (Boe/Kuba)", "Santa Monica", "Santa Veronica (Bae)", "Santiago I (Bulaho)", 
+          "Santiago II (Bulaho)", "Santisimo Rosario (Balagbag)", "Santo Angel (Ilog)", "Santo Cristo", "Santo Niño (Arsum)", 
+          "Silangan Kabubuhayan", "Soledad (Macopa)"]
+      },
+      
+      "San Pedro": {
+        "zip_code": "4023",
+        "barangays": [
+          "Bagong Silang", "Calendola", "Chrysanthemum", "Cuyab", "Estrella", "Fatima", 
+          "G.S.I.S.", "Landayan", "Langgam", "Laram", "Maharlika", "Narra", 
+          "Nueva", "Pacita 1", "Pacita 2", "Poblacion", "Riverside", 
+          "Rosario", "Sampaguita Village", "San Antonio", "San Lorenzo", 
+          "San Roque", "San Vicente", "Sto. Niño", "United Bayanihan"
+        ]
+      },
+
+      "Santa Cruz": {
+        "zip_code": "4009",
+        "barangays": ["Alipit", "Bagumbayan", "Bubukal", "Calios", "Duhat", "Gatid", "Jasaan", "Labuin", "Malinao", "Oogong", 
+          "Pagsawitan", "Palasan", "Patimbao", "Poblacion I", "Poblacion II", 
+          "Poblacion III", "Poblacion IV", "Poblacion V", "San Jose", "San Juan", "San Pablo Norte",
+          "San Pablo Sur", "Santisima Cruz","Santo Angel Central","Santo Angel Norte", "Santo Angel Sur"]
+      },
+        
+      "Santa Maria": {
+        "zip_code": "4022",
+        "barangays": ["Adia", "Bagong Pook", "Bagumbayan", "Bubucal", "Cabooan", "Calangay", "Cambuja", "Coralan", "Cueva", 
+          "Inayapan", "Jose P. Laurel, Sr.", "Jose P. Rizal", "Juan Santiago", "Kayhacat", "Macasipac", "Masinao", "Matalinting", 
+          "Pao-o", "Parang ng Buho", "Poblacion Dos", "Poblacion Quatro", "Poblacion Tres", "Poblacion Uno", "Talangka", "Tungkod"]
+      },
+
+      "Santa Rosa": {
+        "zip_code": "4026",
+        "barangays": [
+          "Aplaya", "Balibago", "Caingin", "Dila", "Dita", "Don Jose", 
+          "Ibaba", "Labas", "Macabling", "Malitlit", "Malusak", 
+          "Market Area (Poblacion)", "Pooc", "Pulong Santa Cruz", 
+          "Sinalhan", "Tagapo"
+        ]
+      },
+
+      "Siniloan": {
+        "zip_code": "4018",
+        "barangays": [
+          "Acevida", "Bagumbarangay", "Buhay", "G. Redor (Poblacion)", 
+          "General Luna", "Halayhayin", "Liyang", "Macatad", "Magsaysay", 
+          "Mayatba", "Pandeno", "Salubungan", "Wawa"
+        ]
+      },
+
+      "Victoria": {
+        "zip_code": "4011",
+        "barangays": [
+          "Banca-banca", "Daniw", "Masapang", "Nanhaya (Poblacion)", 
+          "Pagalangan", "San Benito", "San Felix", "San Francisco", "San Roque"
+        ]
+      }
+    }
+};
+
+const provinceSelect = document.getElementById("province");
+const citySelect = document.getElementById("city");
+const barangaySelect = document.getElementById("barangay");
+
+// Get saved values from Jinja template (after a failed submit)
+const savedProvince = "{{ form.province if form else '' }}";
+const savedCity = "{{ form.city if form else '' }}";
+const savedBarangay = "{{ form.barangay if form else '' }}";
+
+
+// Function to load cities for a province
+function loadCities(province, selectedCity) {
+    const cities = addressData[province] || {};
+    citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
+    Object.keys(cities).forEach(city => {
+        const selected = city === selectedCity ? 'selected' : '';
+        citySelect.innerHTML += `<option value="${city}" ${selected}>${city}</option>`;
+    });
+}
+
+// Function to load barangays and update the ZIP Code
+function loadBarangays(province, city, selectedBarangay) {
+    const cityData = addressData[province]?.[city] || {};
+    const barangays = cityData.barangays || [];
+    
+    // 1. Update ZIP Code
+    zipCodeInput.value = cityData.zip_code || '';
+
+    // 2. Update Barangays
+    barangaySelect.innerHTML = '<option value="">Select Barangay (Optional)</option>';
+    barangays.forEach(b => {
+        const selected = b === selectedBarangay ? 'selected' : '';
+        barangaySelect.innerHTML += `<option value="${b}" ${selected}>${b}</option>`;
+    });
+}
+
+
+// --- Event Listeners (Triggered by user interaction) ---
+
+provinceSelect.addEventListener("change", () => {
+    loadCities(provinceSelect.value, null);
+    barangaySelect.innerHTML = '<option value="">Select Barangay (Optional)</option>';
+    zipCodeInput.value = ''; // Clear Zip Code
+});
+
+citySelect.addEventListener("change", () => {
+    loadBarangays(provinceSelect.value, citySelect.value, null);
+});
+
+
+// --- Initial Load Logic (Fires when the page first loads) ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 💡 FIX: Load cities and barangays if form data is pre-filled (e.g., after an error)
+    if (savedProvince) {
+        loadCities(savedProvince, savedCity);
+        if (savedCity) {
+            loadBarangays(savedProvince, savedCity, savedBarangay);
+        } else {
+             // If province is selected but no city is saved, clear zip code
+             zipCodeInput.value = ''; 
+        }
+    } else {
+        // If nothing is saved, ensure zip code is empty
+        zipCodeInput.value = '';
+    }
+});
+    // Contact Number Length Limit
+    const contact = document.getElementById("contact");
+    contact.addEventListener("input", () => {
+        if (contact.value.length > 11) {
+            contact.value = contact.value.slice(0, 11);
+        }
+    });
+
+    // Birthday → Age (Only computes the age, no validation/alert is performed here)
+    const birthday = document.getElementById('birthday');
+    const age = document.getElementById('age');
+    birthday.addEventListener('change', () => {
+        const birthDate = new Date(birthday.value);
+        const today = new Date();
+        let computedAge = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            computedAge--;
+        }
+        age.value = computedAge >= 0 ? computedAge : '';
+    });
+</script>
+
+</body>
+</html>
